@@ -1,16 +1,18 @@
 const express = require("express");
 const dotenv = require('dotenv');
-
+const bodyParser = require('body-parser')
 dotenv.config({ path: "./config/config.env" });
-
+const {init} = require ('./db')
+const routes = require('./books-api')
+const cors = require('cors');
 const app = express();
-const port = 3000
-app.use(express.static(__dirname + '/'));
+app.use(express.static('public'))
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.json())
+app.use(routes)
+app.use(cors());
 
-app.get("/", (req, res)=> {
-    res.send("App Home!");
-});
-
-app.listen(port, () => console.log(`Hello world app listening on port ${port}!`));
-
-console.log(__dirname);
+init().then(() => {
+    console.log(`Starting Main Server on ${process.env.PORT} port`)
+    app.listen(3000)
+})

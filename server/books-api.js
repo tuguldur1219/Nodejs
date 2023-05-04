@@ -1,111 +1,49 @@
-const {MongoClient} = require("mongodb");
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const fs = require('fs');
+const express = require('express')
+const Joi = require('joi')
 
-const app = express()
-const port = 3000
+const {insertBook, getBook} =
+require('./db')
 
-let books = [{
-    "isbn": "9781593275846",
-    "title": "Eloquent JavaScript, Second Edition",
-    "author": "Marijn Haverbeke",
-    "publish_date": "2014-12-14",
-    "publisher": "No Starch Press",
-    "numOfPages": 472,
-},
-{
-    "isbn": "9781449331818",
-    "title": "Learning JavaScript Design Patterns",
-    "author": "Addy Osmani",
-    "publish_date": "2012-07-01",
-    "publisher": "O'Reilly Media",
-    "numOfPages": 254,
-},
-{
-    "isbn": "9781449365035",
-    "title": "Speaking JavaScript",
-    "author": "Axel Rauschmayer",
-    "publish_date": "2014-02-01",
-    "publisher": "O'Reilly Media",
-    "numOfPages": 460,
-}];
+const router = express.Router()
 
-app.use(cors());
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.post('/book', (req, res) => {
-    const book = req.body;
-    console.log(book);
-    books.push(book)
-    // Write the book data to an HTML file
-    fs.appendFile('books.html',`<div><h2>${book.title}</h2><p>Author: ${book.author}</p><p>Publisher: ${book.publisher}</p><p>Publication Date:
-    ${book.publish_date}</p><p>Number of Pages: ${book.numOfPages}</p><p>ISBN: ${book.isbn}</p></div>`,
-    function (err) {
-      if (err) throw err
-      console.log('Saved!')
+const bookSchema = Joi.object().keys({
+    isbn: Joi.string().length(10),
+    title: Joi.string().required(),
+    author: Joi.string().required(),
+    publish_date: Joi.date().iso(),
+    publisher: Joi.string(),
+    numOfPages: Joi.number().integer()
+});
+router.post('/book', (req, res) =>{
+    const book = req.body
+    console.log(req.body)
+    const result = bookSchema.validate(book)
+    if(result.error) {
+        console.log(result.error)
+        res.status(400).end()
+        return
     }
-  )
-    res.send('Book is added to the database');
+    insertBook(book)
+    .then(()=> {
+        res.send('Book is added to the database');
+        res.status(200).end()
+    })
+    .catch((err) => {
+        console.log(err)
+        res.status(500).end()
+    })
+})
+router.get('/book/:isbn', (req, res) => {
+    const {isbn} = req.params
+    getBook(isbn)
+    .then((book) => {
+        res.json(book)
+        res.status(200).end()
+    })
+    .catch((err) => {
+        console.log(err)
+        res.status(500).end()
+    })
 });
 
-app.get('/book', (req, res) => {
-    res.sendFile(__dirname + '/books.html')
-    res.json(books);
-});
-
-app.get('/book/:isbn', (req, res) => {
-    // reading isbn from the URL
-    const isbn = req.params.isbn;
-
-    // searching books for the isbn
-    for (let book of books) {
-        if (book.isbn === isbn) {
-            res.json(book);
-            return;
-        }
-    }
-
-    // sending 404 when not found something is a good practice
-    res.status(404).send('Book not found');
-});
-
-app.delete('/book/:isbn', (req, res) => {
-    // reading isbn from the URL
-    const isbn = req.params.isbn;
-
-    // remove item from the books array
-    books = books.filter(i => {
-        if (i.isbn !== isbn) {
-            return true;
-        }
-
-        return false;
-    });
-
-    // sending 404 when not found something is a good practice
-    res.send('Book is deleted');
-});
-
-app.post('/book/:isbn', (req, res) => {
-    // reading isbn from the URL
-    const isbn = req.params.isbn;
-    const newBook = req.body;
-
-    // remove item from the books array
-    for (let i = 0; i < books.length; i++) {
-        let book = books[i]
-
-        if (book.isbn === isbn) {
-            books[i] = newBook;
-        }
-    }
-
-    // sending 404 when not found something is a good practice
-    res.send('Book is edited');
-});
-
-app.listen(port, () => console.log(`Hello world app listening on port ${port}!`));
+module.exports = router 
