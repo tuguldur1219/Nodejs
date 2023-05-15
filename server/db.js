@@ -11,26 +11,31 @@ const init= () =>
         const collection = db.collection('books')
         return collection.insertOne(book)
     }
-    // const getBooks = () => {
-    //     const collection = db.collection('books')
-    //     return collection.find({}).toArray()
-    // }
+    
+    const insertBooks = (Bulkbooks) => {
+        const collection = db.collection('books')
+        return collection.insertMany(Bulkbooks)
+    }
+     const getBooks = () => {
+         const collection = db.collection('books')
+         return collection.find({}).toArray()
+     }
      const getBook = (isbn) => {
          const collection = db.collection('books')
          return collection.findOne({isbn: (isbn)})
      }
-    // const updateBook = () => {
-    //     const collection = db.collection('books')
-    //     return collection.updateOne(book)
-    // }
-    // const updateQuantity = () => {
-    //     const collection = db.collection('books')
-    //     return collection.updateOne({numOfPages})
-    // }
-    // const deleteBook = () => {
-    //     const collection = db.collection('books')
-    //     return collection.deleteOne(book)
-    // }
+     const updateBook = (book) => {
+         const collection = db.collection('books')
+         return collection.replaceOne(book)
+    }
+     const updateQuantity = () => {
+         const collection = db.collection('books')
+         return collection.updateOne({numOfPages})
+     }
+     const deleteBook = (isbn) => {
+         const collection = db.collection('books')
+         return collection.deleteOne({isbn: (isbn)})
+     }
     
     
-module.exports = {init, insertBook, getBook}
+module.exports = {init, insertBook, getBook, getBooks, updateBook, updateQuantity, deleteBook, insertBooks}
