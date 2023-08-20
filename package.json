@@ -15,7 +15,7 @@
     "dotenv": "^16.0.3",
     "express-flash": "^0.0.2",
     "express-session": "^1.17.3",
-    "firebase": "^9.21.0",
+    "firebase": "^10.2.0",
     "helmet": "^7.0.0",
     "http-proxy": "^1.18.1",
     "joi": "^17.9.2",
