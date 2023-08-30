@@ -19,8 +19,8 @@
     "helmet": "^7.0.0",
     "http-proxy": "^1.18.1",
     "joi": "^17.9.2",
-    "mongodb": "^5.3.0",
-    "mongoose": "^7.1.0",
+    "mongodb": "^5.8.0",
+    "mongoose": "^7.5.0",
     "mysql": "^2.18.1",
     "node-cache": "^5.1.2"
   },
