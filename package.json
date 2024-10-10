@@ -14,7 +14,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express-flash": "^0.0.2",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.1",
     "firebase": "^9.21.0",
     "helmet": "^7.0.0",
     "http-proxy": "^1.18.1",
